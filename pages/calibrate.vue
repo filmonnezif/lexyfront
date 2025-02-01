@@ -436,6 +436,7 @@ const handleNext = () => {
 
 const handleDone = () => {
   stopRecording()
+  isParaComplete.value = true
   if (currentParagraph.value < 3) {
     currentParagraph.value++
     retryParagraph()
@@ -539,7 +540,10 @@ const stopRecording = () => {
   clearInterval(recordingInterval.value)
   recordingInterval.value = null
   
-  recognition.value.stop()
+  if (recognition.value && !isMobileDevice()) {
+    recognition.value.stop()
+  }
+  
   recorder.value.stopRecording(() => {
     const blob = recorder.value.getBlob()
     sendRecording(blob)
@@ -549,7 +553,6 @@ const stopRecording = () => {
     recorder.value = null
     isRecording.value = false
     isParaComplete.value = true 
-    // Set paragraph as complete
   })
 }
 const parseErrors = (errors) => {
