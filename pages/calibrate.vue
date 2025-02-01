@@ -436,7 +436,6 @@ const handleNext = () => {
 
 const handleDone = () => {
   stopRecording()
-  isParaComplete.value = true
   if (currentParagraph.value < 3) {
     currentParagraph.value++
     retryParagraph()
