@@ -1,13 +1,5 @@
 <template>
   <div class="flex min-h-screen bg-purple-50 dark:bg-gray-900 gap-2">
-    <!-- Left Sheet for mobile -->
-    <Sheet :open="leftSheetOpen" @update:open="leftSheetOpen = $event">
-      <SheetContent side="left" class="w-80 p-4 bg-purple-50 dark:bg-gray-900 dark:text-gray-300 ">
-        <SheetHeader>
-          <SheetTitle>Story time</SheetTitle>
-        </SheetHeader>
-      </SheetContent>
-    </Sheet>
     <!-- Right Sheet for mobile -->
     <Drawer :open="rightSheetOpen" @update:open="rightSheetOpen = $event">
       <DrawerContent class = 'p-4 bg-purple-50 dark:bg-gray-900 dark:text-gray-300 '>
@@ -347,18 +339,6 @@
             }}
         </h1>
         <div class="bg-gray-50 dark:bg-gray-800 p-6 shadow-sm pt-16 text-gray-700 dark:text-gray-300 relative min-h-[calc(100vh-12rem)]">
-          <div class="md:hidden fixed bottom-4 left-4 right-4 flex justify-between z-50">
-            <Button variant="outline" @click="leftSheetOpen = true"
-            class="w-100 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 dark:bg-gray-800 dark:hover:bg-gray-900 border-purple-300 dark:border-purple-700 px-4"
-            >
-              <MegaphoneIcon class="h-4 w-4" />
-            </Button>
-            <Button variant="outline" @click="rightSheetOpen = true"
-            class="w-100 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 dark:bg-gray-800 dark:hover:bg-gray-900 border-purple-300 dark:border-purple-700 px-4"
-            >
-              <Pencil2Icon class="h-4 w-4" />
-            </Button>
-          </div>
           <div id="essay-content" 
               :class="['prose dark:prose-invert', fontClass]"
               v-html="displayContent"
@@ -419,12 +399,6 @@
             left: '78%',
           }"
         ></div>
-      <button 
-        class="exit-focus-button bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring focus:ring-purple-300"
-        @click="focusMode = false"
-      >
-        ✕
-      </button>
       <div 
         class="focus-window"
         :style="{
@@ -562,6 +536,308 @@
       </div>
       <Separator class="my-2" />
     </div>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-purple-50 dark:bg-gray-800 transition-all duration-300 z-100 rounded-t-xl shadow-lg dark:shadow-gray-400/30" :class="{'h-[40vh]': isExpanded, 'h-16': !isExpanded}">
+<!-- Tab Content -->
+  <div v-if="isExpanded" class="relative h-full p-4 overflow-y-auto">
+    <!-- Close Button -->
+    <button 
+      @click="closeExpandedView"
+      class="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+    >
+      <XMarkIcon class="h-6 w-6" />
+    </button>
+    
+    <!-- Dynamic Content Based on Selected Tab -->
+    <div v-if="selectedTab === 'chat'" class="h-full">
+      <!-- Chat Content -->
+      <div class="mt-6">
+        <!-- Your existing chat component content -->
+        <Card class="bg-purple-50/50 dark:bg-gray-800/50 p-6">
+    <div class="flex flex-col items-center space-y-6">
+      <!-- Logo with Status -->
+      <div class="relative">
+        <img 
+          src="https://lexydata.blob.core.windows.net/summary/Lexy.png" 
+          alt="Lexy" 
+          :class="[
+            'w-20 h-20 rounded-full ring-4 ring-purple-400 dark:ring-purple-600 p-1',
+            isSpeaking && 'animate-border'
+          ]"
+        />
+        <div class="absolute -top-2 -mt-2 -right-6 -mr-6">
+          <Badge variant="outline" class="bg-white dark:bg-gray-800">
+            <div class="flex items-center gap-2">
+              <div 
+                class="animate-pulse h-2 w-2 rounded-full" 
+                :class="isListening ? 'bg-green-500' : isSpeaking ? 'bg-blue-500' : isProcessingRequest ? 'bg-yellow-500' : 'bg-gray-500'">
+              </div>
+              <span class="text-xs">
+                {{ isProcessingRequest ? 'Thinking🤔' 
+                   : isSpeaking ? 'Speaking🗣️' 
+                   : isListening ? 'Listening👂' 
+                   : 'Hey👋' }}
+              </span>
+            </div>
+          </Badge>
+        </div>
+      </div>
+
+
+      <!-- Dynamic Message -->
+      <p class="text-center text-gray-700 dark:text-gray-300 font-medium">
+        {{ chatHistory.length > 0 ? chatHistory[chatHistory.length - 1].text : 'Ask Lexy anything about your document' }}
+      </p>
+
+      <!-- Action Button -->
+      <Button 
+        @click="isVoiceChatActive ? stopVoiceChat() : startVoiceChat()" 
+        :class="isVoiceChatActive ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'"
+        class="w-48 text-white transition-all duration-300 transform hover:scale-105"
+      >
+        <div class="flex items-center justify-center gap-2">
+          <MicrophoneIcon v-if="!isVoiceChatActive" class="h-4 w-4" />
+          <StopIcon v-else class="h-4 w-4" />
+          <span>{{ isVoiceChatActive ? 'Stop Chatting' : 'Talk to Lexy' }}</span>
+        </div>
+      </Button>
+    </div>
+  </Card>
+      </div>
+    </div>
+    
+    <div v-if="selectedTab === 'assessment'" class="h-full">
+      <!-- Assessment Content -->
+      <div class="mt-8">
+        <div class="">
+  <div class="flex items-center gap-2">
+    <img 
+      src='https://lexydata.blob.core.windows.net/summary/Lexy.png' 
+      alt="Lexy" 
+      class="w-8 h-8 rounded-full ring-2 ring-purple-200 dark:ring-purple-800"
+    />
+    <Label class="text-lg font-semibold text-gray-700 dark:text-gray-300">Lexy's Reading Test</Label>
+  </div>
+  
+  <!-- No Assessment State -->
+  <div v-if="!hasAssessmentResults" class="bg-purple-50 dark:bg-gray-800 rounded-lg p-2 text-center">
+    <BookOpenIcon class="h-12 w-12 mx-auto text-purple-600 dark:text-purple-400" />
+    <div class="text-center">
+      <h3 class="font-medium text-gray-700 dark:text-gray-300">Test Your Reading with Lexy</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Let's identify areas for improvement</p>
+    </div>
+  </div>
+
+  <!-- Assessment Controls -->
+  <Card class="bg-purple-50/50 dark:bg-gray-800/50 p-2">
+    <div class="space-y-0">
+      <div class="space-y-2 flex items-center justify-between p-2 mx-auto">
+      <!-- Start Button -->
+      <Button 
+        v-if="!isRecording && !isPaused"
+        @click="handlePlayPause" 
+        variant="outline"
+        class="w-auto border-purple-400 hover:border-purple-600 dark:border-purple-600 dark:hover:border-purple-400 bg-purple-50 dark:bg-gray-800 text-purple-600 dark:text-purple-400 mx-auto"
+      >
+        <PlayIcon class="w-4 h-4" v-if="!isProcessing" />
+        <Loader2Icon v-if="isProcessing" class="w-4 h-4 animate-spin" />
+      </Button>
+
+      <!-- Recording State -->
+      <div v-if="isRecording && !isPaused" class="flex items-center gap-2 mx-auto">
+        <Button 
+          @click="pauseRecording"
+          variant="outline"
+          class="border-purple-400 hover:border-purple-600 dark:border-purple-600 bg-purple-50 dark:bg-gray-800 text-purple-600 dark:text-purple-400 mx-auto"
+        >
+          <PauseIcon class="w-4 h-4" />
+        </Button>
+        <Badge variant="destructive" class="animate-pulse">
+          <MicrophoneIcon class="w-4 h-4" />
+        </Badge>
+      </div>
+
+      <!-- Paused State -->
+      <div v-if="isPaused" class="flex gap-2 mx-auto">
+        <Button 
+          @click="resumeRecording"
+          variant="outline"
+          class="border-purple-400 hover:border-purple-600 dark:border-purple-600 bg-purple-50 dark:bg-gray-800 text-purple-600 dark:text-purple-400 mx-auto"
+        >
+          <PlayIcon class="w-4 h-4" />
+        </Button>
+        <Button 
+          @click="assessCurrentProgress"
+          variant="outline"
+          class="border-green-400 hover:border-green-600 dark:border-green-600 bg-green-50 dark:bg-gray-800 text-green-600 dark:text-green-400 mx-auto"
+        >
+          <CheckIcon class="w-4 h-4" />
+          Done
+        </Button>
+        <Button 
+          @click="retryChunk"
+          variant="outline"
+          class="border-gray-400 hover:border-gray-600 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 mx-auto"
+        >
+          <ReloadIcon class="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+    <Separator class="my-2" />
+
+      <!-- Processing State -->
+      <div v-if="isProcessing" class="text-center space-y-4">
+        <p class="text-sm text-gray-600 dark:text-gray-400">Analyzing your reading...</p>
+      </div>
+
+      <!-- Results Display -->
+      <div v-if="recentWpm && !isProcessing" class="space-y-6">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Reading Speed</span>
+          <div class="flex items-center gap-2">
+            <TrendingUpIcon class="h-4 w-4 text-green-500" v-if="isImproving" />
+            <span class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{recentWpm}} WPM</span>
+          </div>
+        </div>
+        
+        <div v-if="recentErrors.length" class="space-y-3">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Words to Practice</span>
+          <div class="flex flex-wrap gap-2">
+            <div v-for="error in recentErrors" :key="error">
+              <Badge variant="outline" class="text-sm cursor-pointer hover:bg-purple-500 hover:text-white bg-purple-100 dark:bg-gray-800 dark:text-purple-400">
+                {{error}}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Card>
+</div>
+      </div>
+    </div>
+    
+    <div v-if="selectedTab === 'settings'" class="h-full">
+      <!-- Settings Content -->
+        <Accordion type="single" collapsible>
+          <AccordionItem value="text-customization">
+              <AccordionTrigger>
+              <h3 class="text-gray-700 textlg dark:text-gray-300">Customize text</h3>
+              </AccordionTrigger>
+              <AccordionContent>
+              <div class="space-y-6">
+                  <div>
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Font Size</label>
+                  <Slider
+                      v-model="fontSizeArray"
+                      :min="12"
+                      :max="32"
+                      :step="1"
+                      class="w-full [&_.relative_.bg-primary]:bg-purple-600 [&_.relative_.border-primary]:border-purple-600"
+                  />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">{{fontSize}}px</span>
+                  </div>
+
+                  <div>
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Line Height</label>
+                  <Slider
+                      v-model="lineHeightArray"
+                      :min="1.5"
+                      :max="3"
+                      :step="0.1"
+                      class="w-full [&_.relative_.bg-primary]:bg-purple-600 [&_.relative_.border-primary]:border-purple-600"
+                  />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">{{lineHeight}}</span>
+                  </div>
+
+                  <div>
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Word Spacing</label>
+                  <Slider
+                      v-model="wordSpacingArray"
+                      :min="0"
+                      :max="20"
+                      :step="1"
+                      class="w-full [&_.relative_.bg-primary]:bg-purple-600 [&_.relative_.border-primary]:border-purple-600"
+                  />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">{{wordSpacing}}px</span>
+                  </div>
+
+                  <div class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Font Type</label>
+                  <Select v-model="selectedFont">
+                      <SelectTrigger class="border-purple-200 dark:border-purple-800 text-gray-700 dark:text-gray-300">
+                      <SelectValue placeholder="Select a font" />
+                      </SelectTrigger>
+                      <SelectContent class="text-sm bg-purple-50 dark:bg-gray-900 font-medium text-gray-700 dark:text-gray-300">
+                      <SelectItem value="OpenDyslexic">OpenDyslexic</SelectItem>
+                      <SelectItem value="Comic Sans MS">Comic Sans</SelectItem>
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      </SelectContent>
+                  </Select>
+                  </div>
+              </div>
+              </AccordionContent>
+          </AccordionItem>
+          </Accordion>
+          <div class="flex items-center justify-between mt-4">
+          <Label class="text-md font-semibold text-gray-700 dark:text-gray-300">Focus Mode</Label>
+          <Switch
+              :checked="focusMode"
+              @update:checked="focusMode = $event"
+              class="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-gray-500 dark:data-[state=unchecked]:bg-gray-700"
+          />
+          </div>    
+          <div class="flex items-center justify-between mt-4">
+          <Label class="text-md font-semibold text-gray-700 dark:text-gray-300">Highlighter</Label>
+          <Switch
+              :checked="highlight"
+              @update:checked="highlight = $event"
+              class="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-gray-500 dark:data-[state=unchecked]:bg-gray-700"
+          />
+          </div>
+          <div class="flex items-center justify-between mt-4 mb-4">
+          <Label class="text-md font-semibold text-gray-700 dark:text-gray-300">Read Along</Label>
+          <Switch
+              :checked="readAlong"
+              @update:checked="readAlong = $event"
+              class="data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-gray-500 dark:data-[state=unchecked]:bg-gray-700"
+          />
+          </div>
+      <div class="space-y-4">
+        <!-- Your existing settings component content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Tab Bar -->
+  <div class="flex justify-around items-center h-16 border-t border-purple-200 dark:border-purple-800 rounded-t-lg shadow-md dark:shadow-gray-400/30">
+    <button 
+      @click="expandTab('chat')"
+      class="flex flex-col items-center gap-1 text-purple-600 dark:text-purple-400"
+      :class="{'text-purple-800 dark:text-purple-200': selectedTab === 'chat'}"
+    >
+      <MicrophoneIcon class="h-6 w-6" />
+      <span class="text-xs">Chat</span>
+    </button>
+
+    <button 
+      @click="expandTab('assessment')"
+      class="flex flex-col items-center gap-1 text-purple-600 dark:text-purple-400"
+      :class="{'text-purple-800 dark:text-purple-200': selectedTab === 'assessment'}"
+    >
+      <BookOpenIcon class="h-6 w-6" />
+      <span class="text-xs">Assessment</span>
+    </button>
+
+    <button 
+      @click="expandTab('settings')"
+      class="flex flex-col items-center gap-1 text-purple-600 dark:text-purple-400"
+      :class="{'text-purple-800 dark:text-purple-200': selectedTab === 'settings'}"
+    >
+      <CursorTextIcon class="h-6 w-6" />
+      <span class="text-xs">Settings</span>
+    </button>
+  </div>
+</div>
   </div>
 </template>
 
@@ -573,13 +849,72 @@ import { useTextToSpeech } from '~/composables/useTextToSpeech'
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { debounce } from 'lodash-es'
 import { Pencil2Icon, SpeakerLoudIcon } from '@radix-icons/vue'
-import { PlayIcon, PauseIcon, MicrophoneIcon, ArrowRightIcon, CheckIcon, EyeIcon, PencilIcon, SparklesIcon, ArrowPathIcon, ChevronRightIcon, LanguageIcon } from '@heroicons/vue/24/solid'
+import { PlayIcon, PauseIcon, MicrophoneIcon, ArrowRightIcon, CheckIcon, EyeIcon, PencilIcon, SparklesIcon, ArrowPathIcon, ChevronRightIcon, LanguageIcon, XMarkIcon } from '@heroicons/vue/24/solid'
 import { ReloadIcon } from '@radix-icons/vue'
 import { CursorTextIcon} from '@radix-icons/vue'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
-import { Loader2Icon } from 'lucide-vue-next'
+import { Loader2Icon, TrendingUpIcon } from 'lucide-vue-next'
 import html2pdf from 'html2pdf.js'
+import { useTranscription } from '@/composables/useTranscription'
 
+
+const isExpanded = ref(false)
+const selectedTab = ref(null)
+
+const expandTab = (tab) => {
+  if (selectedTab.value === tab && isExpanded.value) {
+    isExpanded.value = false
+    selectedTab.value = null
+  } else {
+    selectedTab.value = tab
+    isExpanded.value = true
+  }
+}
+
+const closeExpandedView = () => {
+  isExpanded.value = false
+  selectedTab.value = null
+}
+
+const { transcription, interimTranscription, connect, sendAudioChunk, disconnect } = useTranscription()
+let vchat = false
+let rtest = false
+const vTrans = ref('')
+const lastSentTrans = ref('')
+
+watch([transcription, interimTranscription], ([newTranscription, newInterim]) => {
+  const textToProcess = newInterim || newTranscription
+  const textToSpeech = newTranscription
+  if (textToProcess && rtest) {
+    processSpeech(textToProcess)
+  }
+  if (textToSpeech && vchat) {
+    console.log("vchat is true")
+    vTrans.value = textToSpeech
+    // Check if WebSocket is open and we haven’t already sent this transcription
+    if (ws.value && ws.value.readyState === WebSocket.OPEN &&
+        vTrans.value.trim() !== '' && vTrans.value !== lastSentTrans.value &&
+        !isProcessingRequest.value) {
+      isProcessingRequest.value = true
+      chatHistory.value.push({ type: 'user', text: vTrans.value })
+      try {
+        ws.value.send(JSON.stringify({
+          type: 'message',
+          message: vTrans.value
+        }))
+        lastSentTrans.value = vTrans.value
+      } catch (error) {
+        console.error('Error sending transcription:', error)
+        isProcessingRequest.value = false
+      }
+    }
+  }
+})
+
+const Url = 'wss://dyslexai-gvbfgqdkdkg0dwhw.canadacentral-01.azurewebsites.net/ws/transcribe'
+const startTranscription = () => {  // Opens websocket connection to your Azure transcription endpoint.
+  connect(Url)
+}
 
 const chunks = ref([])
 const currentChunkIndex = ref(0)
@@ -708,6 +1043,9 @@ const hasCommonCharacters = (word, buffer) => {
 const startRecording = async () => {
   try {
     isPaused.value = false
+    disconnect()
+    rtest = true
+    startTranscription()
     stream.value = await navigator.mediaDevices.getUserMedia({
       audio: {
         sampleRate: 44100,
@@ -723,13 +1061,16 @@ const startRecording = async () => {
       recorderType: RecordRTC.StereoAudioRecorder,
       numberOfAudioChannels: 1,
       checkForInactiveTracks: true,
-      timeSlice: 1000
+      timeSlice: 250, // Send chunks every 250ms for more real-time experience
+      ondataavailable: (blob) => {
+        blob.arrayBuffer().then(buffer => {
+          sendAudioChunk(buffer)
+        })
+      }
     })
 
     console.log('Recording started')
-    setupSpeechRecognition()
     recorder.value.startRecording()
-    recognition.value.start()
     isRecording.value = true
     console.log('it should be recording')
     
@@ -777,7 +1118,7 @@ const setupSpeechRecognition = () => {
 const stopRecording = () => {
   if (!recorder.value || !stream.value) return
 
-  recognition.value.stop()
+  rtest = false
   recorder.value.stopRecording(() => {
     const blob = recorder.value.getBlob()
     processReadingData(chunks.value[currentChunkIndex.value], blob)
@@ -795,9 +1136,8 @@ const initializeReading = (text) => {
 }
 
 const pauseRecording = () => {
-  if (recognition.value) {
-    recognition.value.stop()
-  }
+  rtest = false
+  disconnect()
   isPaused.value = true
   // Store current progress
   const currentProgress = {
@@ -822,8 +1162,9 @@ const resumeRecording = () => {
 
 const assessCurrentProgress = async () => {
   if (!recorder.value || !stream.value) return
-  
-  recognition.value.stop()
+
+  rtest = false
+  disconnect()
   recorder.value.stopRecording(() => {
     const blob = recorder.value.getBlob()
     const currentText = chunks.value[currentChunkIndex.value]
@@ -906,6 +1247,8 @@ const processReadingData = async (chunk, recording) => {
       }
     })
     updateReadingResults(response.data)
+    readWordIndices.value = new Set()
+    totalWordsRead.value = 0
   } catch (error) {
     console.error('Error processing reading data:', error)
   } finally {
@@ -1222,7 +1565,12 @@ const isListening = ref(false)
 const isSpeaking = ref(false)
 const isProcessingRequest = ref(false)
 
+const changebutton = () => {
+  isVoiceChatActive.value = true
+}
+
 const startVoiceChat = async () => {
+  changebutton()
   const userId = localStorage.getItem('userId')
   const tempDiv = document.createElement('div')
   tempDiv.innerHTML = convertedHtml.value
@@ -1232,8 +1580,47 @@ const startVoiceChat = async () => {
     plainText = words.slice(0, 500).join(' ')
   }
 
-  ws.value = new WebSocket(`wss://dyslexai-gvbfgqdkdkg0dwhw.canadacentral-01.azurewebsites.net/ws/audio-chat/${userId}`)
+  vchat = true
 
+  try {
+    stream.value = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        sampleRate: 44100,
+        channelCount: 1,
+        echoCancellation: true,
+        noiseSuppression: true
+      }
+    })
+  } catch (error) {
+    console.error('Error accessing microphone for voice chat:', error)
+    return
+  }
+  
+  // Instead of setting up another transcription flow, we rely on the shared transcription
+  // watcher to send transcription to the backend.
+  vchat = true 
+  // Call startTranscription() once if transcription isn't connected yet.
+  startTranscription()
+
+  recorder.value = new RecordRTC(stream.value, {
+    type: 'audio',
+    mimeType: 'audio/wav',
+    recorderType: RecordRTC.StereoAudioRecorder,
+    numberOfAudioChannels: 1,
+    checkForInactiveTracks: true,
+    timeSlice: 250, // Send chunks every 250ms for a more real-time experience
+    ondataavailable: (blob) => {
+      blob.arrayBuffer().then(buffer => {
+        sendAudioChunk(buffer)
+      })
+    }
+  })
+  
+  isVoiceChatActive.value = true
+  isListening.value = true
+  recorder.value.startRecording()
+
+  ws.value = new WebSocket(`wss://dyslexai-gvbfgqdkdkg0dwhw.canadacentral-01.azurewebsites.net/ws/audio-chat/${userId}`)
   ws.value.onopen = () => {
     ws.value.send(JSON.stringify({
       type: 'context',
@@ -1242,16 +1629,7 @@ const startVoiceChat = async () => {
   }
   
   ws.value.onmessage = async (event) => {
-    // Pause recognition and recording while processing the response
-    if (recognition.value) {
-      recognition.value.stop()
-      isListening.value = false
-    }
     
-    if (recorder.value) {
-      recorder.value.pauseRecording()
-    }
-  
     // Process the audio response
     isSpeaking.value = true
     isProcessingRequest.value = false // Reset processing state after response
@@ -1269,61 +1647,55 @@ const startVoiceChat = async () => {
     source.onended = () => {
       isSpeaking.value = false
       currentAudioSource.value = null
-
-      // Restart recognition and recording if voice chat is still active:
-      if (isVoiceChatActive.value) {
-        if (recognition.value) {
-          recognition.value.start()
-          isListening.value = true
-        }
-        if (recorder.value) {
-          recorder.value.resumeRecording()
-        }
-      }
     }
     
     source.start()
   }
   
-  recognition.value = new webkitSpeechRecognition()
-  recognition.value.continuous = true
-  recognition.value.interimResults = false
-  
-  recognition.value.onresult = (event) => {
-    const transcript = event.results[event.results.length - 1][0].transcript
-    
-    // Only send new request if not processing previous one
-    if (!isProcessingRequest.value) {
-      isProcessingRequest.value = true
-      chatHistory.value.push({ type: 'user', text: transcript })
-      ws.value.send(JSON.stringify({
-        type: 'message',
-        message: transcript
-      }))
-    }
-  }
-  
-  isVoiceChatActive.value = true
-  recognition.value.start()
-  isListening.value = true
 }
 
+
+const sendTranscriptionToBackend = () => {
+  // Ensure newTranscription exists and trim whitespace.
+
+  // Check if WebSocket is ready
+  if (!ws.value || ws.value.readyState !== WebSocket.OPEN) {
+    console.error('WebSocket is not open')
+    return
+  }
+
+  // Only send if we are not already processing a request
+  if (vTrans.value && vTrans.value.trim() !== '' && vTrans.value !== lastSentTrans.value && !isProcessingRequest.value) {
+    isProcessingRequest.value = true
+    chatHistory.value.push({ type: 'user', text: vTrans.value })
+    
+    try {
+      ws.value.send(JSON.stringify({
+        type: 'message',
+        message: vTrans.value
+      }))
+      lastSentTrans.value = vTrans.value
+    } catch (error) {
+      console.error('Error sending transcription:', error)
+      isProcessingRequest.value = false
+    }
+  }
+}
+
+
 const stopVoiceChat = () => {
+  vchat = false
+  disconnect()
   if (ws.value) {
     ws.value.close()
     ws.value = null
-  }
-  
-  if (recognition.value) {
-    recognition.value.stop()
-    isListening.value = false
   }
   
   if (recorder.value) {
     recorder.value.stopRecording()
     recorder.value = null
   }
-  
+
   if (stream.value) {
     stream.value.getTracks().forEach(track => track.stop())
     stream.value = null
@@ -1337,6 +1709,7 @@ const stopVoiceChat = () => {
   
   isVoiceChatActive.value = false
   isSpeaking.value = false
+  isListening.value = false
   chatHistory.value = []
 }
 
@@ -1403,21 +1776,21 @@ onUnmounted(() => {
 
 .overlay-section {
   position: fixed;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   pointer-events: none; 
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .overlay-section.left {
   left: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   height: 100vh !important;
   top: 0 !important;
 }
 
 .overlay-section.right {
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   height: 100vh !important;
   top: 0 !important;
 }
@@ -1456,7 +1829,21 @@ span {
   margin: 0;
   padding: 0;
 }
-  
+
+.expanded-content {
+  transform-origin: bottom;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 .word-progress {
   display: inline-block;
   transition: all 0.3s ease;

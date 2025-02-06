@@ -75,7 +75,7 @@
           variant="outline" 
           size="lg" 
           class="mt-8 border-purple-400 dark:border-violet-500 hover:bg-purple-100 animate-bounce-slow"
-          @click="$router.push('/calibrate')"
+          @click= "startUser"
         >
           {{ $t('hero.tryDemo') }}
         </Button>   
@@ -88,6 +88,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+const router = useRouter()
   
 const floatingChars = ref([])
 let charId = 0
@@ -148,6 +151,37 @@ let animationFrame
 function animate() {
   animateChars()
   animationFrame = requestAnimationFrame(animate)
+}
+
+const startUser = async () => {
+  //userId.value = localStorage.getItem('userId')
+  /*if (userId.value) {
+    showUserInfoDialog.value = false
+    showDialog.value = true
+    return
+  }*/
+  try {
+    const response = await axios.post('https://dyslexai-gvbfgqdkdkg0dwhw.canadacentral-01.azurewebsites.net/demo-signup', {
+      username: ' ',
+      age: 0
+    })
+    
+    // Store user info for later use
+    localStorage.setItem('userId', response.data.id)
+    localStorage.setItem('username', response.data.username)
+    const initialResults = {
+      wpm: [],
+      errors: [],
+      userId: response.data.id,
+      username: response.data.username,
+      age: 0
+    }
+    localStorage.setItem('readingResults', JSON.stringify(initialResults))
+    
+  } catch (error) {
+    console.error('Error saving user info:', error)
+  }
+  router.push('/home')
 }
 
 onMounted(() => {

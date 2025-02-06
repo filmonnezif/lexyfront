@@ -202,10 +202,27 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { MicrophoneIcon, PlayIcon, PauseIcon, ArrowRightIcon, CheckIcon } from '@heroicons/vue/24/solid'
 import { ReloadIcon } from '@radix-icons/vue'
+import { useTranscription } from '@/composables/useTranscription'
+
 let RecordRTC: any
 if (process.client) {
   RecordRTC = (await import('recordrtc')).default
 }
+const { transcription, interimTranscription, connect, sendAudioChunk, disconnect } = useTranscription()
+
+// Update the watch function to handle both interim and final results
+watch([transcription, interimTranscription], ([newTranscription, newInterim]) => {
+  const textToProcess = newInterim || newTranscription
+  if (textToProcess) {
+    processSpeech(textToProcess)
+    }
+})
+
+const Url = 'wss://dyslexai-gvbfgqdkdkg0dwhw.canadacentral-01.azurewebsites.net/ws/transcribe'
+const startTranscription = () => {  // Opens websocket connection to your Azure transcription endpoint.
+  connect(Url)
+}
+
 const showUserInfoDialog = ref(true)
 const isPaused = ref(false)
 const userInfo = ref({
@@ -316,6 +333,7 @@ const handlePlayPause = () => {
       recordingInterval.value = null
       recognition.value.stop()
       recorder.value.pauseRecording()
+      disconnect()
     }
   }
 }
@@ -326,7 +344,7 @@ const isParaComplete = ref(false)
 
 const currentPosition = ref(0)
 const transcriptBuffer = ref('')
-const lookAheadWindow = 3
+const lookAheadWindow = 5
 
 const initializeWordProgress = () => {
   const words = paragraphs[currentParagraph.value - 1].split(' ')
@@ -446,7 +464,7 @@ const handleDone = () => {
 }
 
 const setupSpeechRecognition = () => {
-  if (!process.client || isMobileDevice()) return
+  if (!process.client) return
   
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
   recognition.value = new SpeechRecognition()
@@ -489,6 +507,9 @@ const setupSpeechRecognition = () => {
 const startRecording = async () => {
   if (!process.client) return
   
+  disconnect()
+  startTranscription()
+
   try {
     isPaused.value = false
     recordingSeconds.value = 0
@@ -510,18 +531,14 @@ const startRecording = async () => {
       recorderType: RecordRTC.StereoAudioRecorder,
       numberOfAudioChannels: 1,
       checkForInactiveTracks: true,
-      timeSlice: 1000
+      timeSlice: 250, // Send chunks every 250ms for more real-time experience
+      ondataavailable: (blob) => {
+        blob.arrayBuffer().then(buffer => {
+          sendAudioChunk(buffer)
+        })
+      }
     })
 
-    // Only setup speech recognition for desktop
-    if (!isMobileDevice()) {
-      setupSpeechRecognition()
-      recognition.value.start()
-    } else {
-      // For mobile, just start recording without speech recognition
-      isRecording.value = true
-    }
-    
     recorder.value.startRecording()
     isRecording.value = true
     
@@ -530,19 +547,13 @@ const startRecording = async () => {
   }
 }
 
-const isMobileDevice = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-}
-
 const stopRecording = () => {
   if (!recorder.value || !stream.value) return
 
   clearInterval(recordingInterval.value)
   recordingInterval.value = null
   
-  if (recognition.value && !isMobileDevice()) {
-    recognition.value.stop()
-  }
+  disconnect()
   
   recorder.value.stopRecording(() => {
     const blob = recorder.value.getBlob()

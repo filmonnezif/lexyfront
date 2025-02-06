@@ -1,95 +1,122 @@
 <template>
-  <div class="min-h-screen bg-purple-50 dark:bg-gray-900 p-8 relative">
-    <Card class="mb-8 bg-transparent dark:bg-gray-800/50 backdrop-blur p-6">
-      <CardContent>
-        <div class="flex flex-col md:flex-row gap-6 mt-4">
-          <!-- User Info + Stats Combined Column -->
-          <div class="flex-1/3 space-y-4">
-            <!-- User Info Row -->
-            <div class="flex items-center gap-4 bg-purple-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-300 dark:border-gray-700">
-              <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-full">
-                <UserIcon class="w-6 h-6 text-purple-600 dark:text-purple-400" />
+  <div class="min-h-screen bg-purple-50 dark:bg-gray-900 p-2 md:p-8 relative">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-[550px] md:h-[300px] overflow-y-auto overflow-x-hidden mb-2 ">
+      <!-- Left Column: User Profile + Practice Words -->
+          <Card class="h-full bg-white/50 dark:bg-gray-800/50 backdrop-blur">
+            <CardContent>
+            <!-- Guest View -->
+            <div v-if="isDefaultUser" class="text-center py-2 md:py-8">
+              <div class="mb-2 md:mb-4">
+                <UserIcon class="w-10 h-8 md:w-14 md:h-14 mx-auto text-purple-500 opacity-50" />
               </div>
-              <span class="text-lg font-medium text-gray-700 dark:text-gray-300">
-                {{ username }} {{ age }}
-              </span>
+              <h3 class="md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-4">
+                Personalize Your Reading Experience
+              </h3>
+              <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-2 md:mb-6">
+                Complete a quick calibration to help us personaliz your experience. 
+              </p>
+              <Button 
+                @click="signupAndCalibrate" 
+                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-full transition-all text-sm md:text-base"
+              >
+                Get Started
+              </Button>
             </div>
 
-            <!-- WPM Stats Row -->
-            <div class="bg-purple-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-300 dark:border-gray-700">
-              <div class="flex items-center">
-                <div class="flex flex-col">
-                  <span class="text-2xl font-bold text-gray-700 dark:text-gray-300">
-                    {{ calculateAverageWPM() }} <span class="text-sm">WPM</span>
-                  </span>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Average speed</span>
+            <!-- Logged In User View -->
+            <div v-else class="space-y-2">
+              <!-- User Profile Card -->
+              <div class="flex flex-col h-full">
+                <!-- Top Section: Name and Speed side by side -->
+                <div class="flex items-center justify-between mb-2 px-4 py-2 bg-purple-50/50 dark:bg-gray-800/50 rounded-xl">
+                  <!-- User info -->
+                  <div class="flex items-center gap-2">
+                    <UserIcon class="w-6 h-6 text-purple-600" />
+                    <h3 class="text-lg md:text-base">{{ username }}</h3>
+                  </div>
+                  <!-- WPM Stats -->
+                  <div class="flex items-center gap-2">
+                    <div class="text-2xl md:text-xl font-bold text-purple-600">
+                      {{ calculateAverageWPM() }}
+                      <span class="text-sm md:text-xs">WPM</span>
+                    </div>
+                    <DotLottieVue 
+                      class="h-12 w-12 md:h-10 md:w-10"
+                      autoplay
+                      loop
+                      :speed="calculateAnimationSpeed()"
+                      src="https://lottie.host/9ebed050-824d-446b-93a1-3f65e4792342/ePzyWsOlMh.lottie"
+                    />
+                  </div>
                 </div>
-                <DotLottieVue 
-                  class="h-20 w-24" 
-                  autoplay 
-                  loop 
-                  :speed="calculateAnimationSpeed()"
-                  src="https://lottie.host/9ebed050-824d-446b-93a1-3f65e4792342/ePzyWsOlMh.lottie" 
-                />
+
+                <!-- Bottom Section: Scrollable Practice Words -->
+                <div class="flex-1 overflow-y-auto">
+                  <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl p-4">
+                    <h4 class="text-sm font-medium mb-2">Words to Practice</h4>
+                    <div class="flex flex-wrap gap-1 max-h-[150px] overflow-y-auto">
+                      <span 
+                        v-for="error in errors"
+                        :key="error"
+                        class="px-2 py-1 text-xs md:text-[10px] bg-purple-100 text-purple-700 rounded-full"
+                      >
+                        {{ error }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <!-- Words to Practice Column -->
-          <div class="flex-1 max-h-44 overflow-y-auto">
-            <div class="rounded-lg p-4 h-full">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
-                Words to Practice
-              </span>
-              <div class="flex flex-wrap gap-2">
-                <span 
-                  v-for="error in errors" 
-                  :key="error"
-                  class="px-2 py-1 text-sm bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded"
-                >
-                  {{ error }}
-                </span>
+            </CardContent>
+          </Card>
+          <!-- Analytics Section -->
+          <Card class="h-full bg-white/50 dark:bg-gray-800/50 backdrop-blur">
+            <CardContent>
+              <h4 class="md:text-lg font-medium text-gray-700 dark:text-gray-300">
+                Progress Analytics
+                <span class="text-sm text-gray-500 dark:text-gray-400"> (Mock data)</span>
+              </h4>
+              <div class="grid md:grid-cols-2 gap-1 grid-cols-1">
+                <!-- Reading Speed Progress Chart -->
+                <v-chart class="h-32 md:h-40" :option="speedProgressOption" />
+                
+                <!-- Error Types Chart -->
+                <v-chart class="h-32 md:h-40" :option="accuracyOption" />
               </div>
-            </div>
-          </div>
-          <div class="flex-1">
-          <div class="rounded-lg p-2 h-full">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
-              Progress Analytics
-              <span class="text-xs text-gray-500">(Sample data for demonstration)</span>
-            </span>
-            <div class="grid md:grid-cols-2 gap-2 grid-cols-1">
-              <!-- Reading Speed Progress Chart -->
-              <v-chart class="h-40" :option="speedProgressOption" />
-              
-              <!-- Error Types Chart -->
-              <v-chart class="h-40" :option="accuracyOption" />
-            </div>
-          </div>
+              <div class="mt-2 flex items-center gap-1 overflow-x-auto py-1">
+      <div v-for="badge in badges" :key="badge.id" 
+        class="flex-shrink-0 flex items-center bg-purple-100/50 dark:bg-purple-900/30 rounded-full px-2 py-0.5"
+        :title="badge.description">
+        <span class="text-base mr-1">{{badge.icon}}</span>
+        <span class="text-xs font-medium text-purple-700 dark:text-purple-300 whitespace-nowrap">{{badge.title}}</span>
+      </div>
+    </div>
+            </CardContent>
+          </Card>
         </div>
-        </div>
-      </CardContent>
-    </Card>
 
-    <div class="text-xl font-medium text-gray-700 dark:text-gray-300 border-b border-gray-300 dark:border-gray-700 pb-2 mb-4">
+
+    <div class="text-xl font-medium text-gray-700 dark:text-gray-300 border-b border-gray-300 dark:border-gray-700 pb-2 mb-4 mt-4">
         Documents ({{ documents.length }})
       </div>
     <!-- Document Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div 
-        v-for="doc in documents" 
-        :key="doc.id" 
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow"
+        v-for="doc in documents"
+        :key="doc.id"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 md:p-4"
         @click="navigateToRead(doc.extractedText, doc.fileName)"
-      >        
-        <div class="flex items-center gap-2 mb-3">
-          <FileIcon class="w-5 h-5 text-purple-500" />
-          <h4 class="font-medium text-gray-700 dark:text-gray-300">
+
+      >
+        <!-- Existing card content with smaller text -->
+        <div class="flex items-center gap-2 mb-2">
+          <FileIcon class="w-4 h-4 md:w-5 md:h-5 text-purple-500" />
+          <h4 class="text-sm md:text-base font-medium">
             {{ doc.fileName.length > 30 
               ? doc.fileName.substring(0, 15) + '...' + doc.fileName.substring(doc.fileName.length - 7) 
               : doc.fileName 
             }}
-          </h4>        
+          </h4>
         </div>
         <div class="flex items-center text-gray-600 dark:text-gray-400 text-sm">
           <p class="mr-2">click to read</p>
@@ -258,6 +285,34 @@ import { LineChart, BarChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 
+
+const badges = ref([
+  {
+    id: 1,
+    icon: '🏃',
+    title: 'Swift Reader',
+    description: 'Read 100+ words per minute!'  },
+  {
+    id: 2,
+    icon: '🎯',
+    title: 'Accuracy Master',
+    description: '95% reading accuracy achieved'
+  },
+  {
+    id: 3,
+    icon: '📚',
+    title: 'Bookworm',
+    description: 'Completed 5 documents'
+  },
+  {
+    id: 4,
+    icon: '⭐',
+    title: 'Rising Star',
+    description: 'Improved speed by 20%'
+  }
+])
+
+
 const username = ref('')
 const age = ref('')
 const calculateAverageWPM = () => {
@@ -275,6 +330,16 @@ onMounted(() => {
   username.value = localStorage.getItem('username') || ''
   age.value = localStorage.getItem('age') || ''
 })
+
+const isDefaultUser = computed(() => {
+  return username.value.trim() === '' || Number(age.value) === 0
+})
+
+// Function to navigate to calibrate page
+const signupAndCalibrate = () => {
+  router.push('/calibrate')
+}
+
 const errors = computed(() => {
   const results = JSON.parse(localStorage.getItem('readingResults') || '{"errors":[]}')
   return results.errors
@@ -477,21 +542,27 @@ const speedProgressOption = ref({
     extraCssText: 'text-xs'
   },
   grid: {
-    top: '15%',
-    left: '10%',
-    right: '5%',
-    bottom: '15%'
+    top: '12%',
+    left: '8%',
+    right: '4%',
+    bottom: '12%'
   },
   xAxis: {
     type: 'category',
     data: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-    axisLabel: { fontSize: 10 }
+    axisLabel: { fontSize: 8
+
+     }
   },
   yAxis: {
     type: 'value',
     name: 'WPM',
-    nameTextStyle: { fontSize: 10 },
-    axisLabel: { fontSize: 10 }
+    nameTextStyle: { fontSize: 8
+
+     },
+    axisLabel: { fontSize: 8
+
+     }
   },
   series: [{
     data: [65, 72, 70, 78, 82, 85, 89],
@@ -519,21 +590,26 @@ const accuracyOption = ref({
     extraCssText: 'text-xs'
   },
   grid: {
-    top: '15%',
-    left: '10%',
-    right: '5%',
-    bottom: '15%'
+    top: '12%',
+    left: '8%',
+    right: '4%',
+    bottom: '12%'
   },
   xAxis: {
     type: 'category',
     data: ['Omission', 'Insertion', 'Hesitation'],
-    axisLabel: { fontSize: 10, interval: 0 }
+    axisLabel: { fontSize: 8
+      , interval: 0 }
   },
   yAxis: {
     type: 'value',
     name: 'Count',
-    nameTextStyle: { fontSize: 10 },
-    axisLabel: { fontSize: 10 }
+    nameTextStyle: { fontSize: 8
+
+     },
+    axisLabel: { fontSize: 8
+
+     }
   },
   series: [{
     data: [5, 3, 7],
