@@ -138,7 +138,6 @@
           </div>
         </div>
         <Button
-            v-if="isCalibrating"
             @click="skipToHome"
             class="fixed bottom-2 right-2 bg-gray-600/50 hover:bg-gray-700 dark:hover:text-white text-white px-6 py-2 dark:text-gray-500 rounded-full shadow-lg flex items-center gap-2"
           >
