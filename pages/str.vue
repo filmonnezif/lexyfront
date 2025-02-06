@@ -894,7 +894,7 @@ watch([transcription, interimTranscription], ([newTranscription, newInterim]) =>
     // Check if WebSocket is open and we haven’t already sent this transcription
     if (ws.value && ws.value.readyState === WebSocket.OPEN &&
         vTrans.value.trim() !== '' && vTrans.value !== lastSentTrans.value &&
-        !isProcessingRequest.value) {
+        !isProcessingRequest.value && !isSpeaking.value) {
       isProcessingRequest.value = true
       chatHistory.value.push({ type: 'user', text: vTrans.value })
       try {
@@ -1632,6 +1632,7 @@ const startVoiceChat = async () => {
     
     // Process the audio response
     isSpeaking.value = true
+    disconnect()
     isProcessingRequest.value = false // Reset processing state after response
   
     const audioBlob = new Blob([event.data], { type: 'audio/wav' })
@@ -1646,6 +1647,7 @@ const startVoiceChat = async () => {
 
     source.onended = () => {
       isSpeaking.value = false
+      startTranscription()
       currentAudioSource.value = null
     }
     

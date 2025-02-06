@@ -1,53 +1,36 @@
 <template>
   <div class="min-h-screen bg-purple-50 dark:bg-gray-900 p-8 relative">
     <Dialog :open="showDialog">
-      <DialogContent class="bg-purple-50 max-w-3xl dark:bg-gray-900 text-gray-700 dark:text-gray-300">
+      <DialogContent class="bg-purple-50 max-w-3xl mx-4 sm:mx-auto dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-2xl shadow-xl border border-purple-100 dark:border-gray-800">
         <!-- Initial Welcome Content -->
-        <div v-if="showUserInfoDialog" class="max-w-2xl mx-auto space-y-6">
-          <DialogHeader class="space-y-4">
-            <DialogTitle >
-              <span class="text-3xl font-bold text-gray-800 dark:text-gray-200">Welcome to Lexy</span>
-            </DialogTitle>
-            <DialogDescription class="text-xl font-medium text-gray-700 dark:text-gray-300">
-              Let's personalize your experience
-            </DialogDescription>
-          </DialogHeader>
+        <div v-if="showUserInfoDialog" class="max-w-2xl mx-auto space-y-4 p-3 sm:p-6">
+  <DialogHeader class="space-y-2">
+    <DialogDescription class="text-lg sm:text-xl font-medium text-gray-700 dark:text-gray-300">
+      Let's personalize your experience
+    </DialogDescription>
+  </DialogHeader>
 
-          <div class="grid gap-6 py-6">
-            <div class="space-y-2">
-              <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Your Name</label>
-              <input 
-                v-model="userInfo.username" 
-                type="text"
-                placeholder="Enter your name"
-                class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 
-                      bg-white dark:bg-gray-800 focus:ring-2 focus:ring-purple-500 
-                      transition-all duration-200 outline-none"
-              />
-            </div>
-            <div class="space-y-2">
-              <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Your Age</label>
-              <input 
-                v-model="userInfo.age" 
-                type="number"
-                placeholder="Enter your age"
-                class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 
-                      bg-white dark:bg-gray-800 focus:ring-2 focus:ring-purple-500 
-                      transition-all duration-200 outline-none"
-              />
-            </div>
-            <div class="space-y-2">
-              <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Your School</label>
-              <input 
-                v-model="userInfo.school" 
-                type="text"
-                placeholder="Enter your school"
-                class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 
-                      bg-white dark:bg-gray-800 focus:ring-2 focus:ring-purple-500 
-                      transition-all duration-200 outline-none"
-              />
-            </div>
-          </div>
+  <div class="grid gap-4 py-2">
+    <div class="space-y-1">
+      <label class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Your Name</label>
+      <input 
+        v-model="userInfo.username" 
+        type="text"
+        placeholder="Enter your name"
+        class="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-200 
+              dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 
+              focus:ring-purple-500 transition-all duration-200 outline-none
+              text-sm sm:text-base"
+      />
+    </div>
+  </div>
+  <div class="max-w-2xl mx-auto">
+    <DialogHeader class="space-y-2">
+      <DialogDescription class="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+        Take a brief 3-paragraph reading test to help us optimize your experience.
+      </DialogDescription>
+    </DialogHeader>
+  </div>
 
           <DialogFooter class="flex justify-end pt-4">
             <Button 
@@ -62,60 +45,32 @@
           </DialogFooter>
         </div>
 
-        <!-- Calibration Intro -->
-        <div v-else-if="!isCalibrating" class="max-w-2xl mx-auto space-y-8 py-4">
-          <DialogHeader class="space-y-4">
-            <DialogTitle class="text-2xl font-bold text-gray-800 dark:text-gray-200">
-              Quick Reading Assessment
-            </DialogTitle>
-            <DialogDescription class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              Take a brief 3-paragraph reading test to help us optimize your experience.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter class="flex gap-8 pt-8">
-            <Button 
-              variant="outline" 
-              class="flex-1 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:hover:text-gray-400"
-              @click="skipCalibration"
-            >
-              Skip for Now
-            </Button>
-            <Button 
-              class="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white shadow-lg dark:hover:bg-purple-500 border-white dark:border-gray-300"
-              @click="startCalibration"
-            >
-              Start Assessment
-            </Button>
-          </DialogFooter>
-        </div>
-
 
         <!-- Calibration Content -->
-        <div v-else class="max-w-3xl mx-auto">
+        <div v-else class="max-w-3xl mx-auto p-3">
           <DialogHeader>
-            <DialogTitle class="text-xl font-bold mb-6 text-gray-700 text-center dark:text-gray-300">
+            <DialogTitle class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-700 text-center dark:text-gray-300">
               Paragraph {{ currentParagraph }}/3
             </DialogTitle>
           </DialogHeader>
 
           <!-- Countdown Overlay -->
           <div v-if="showCountdown" class="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span class="text-6xl text-white font-bold">{{ countdown }}</span>
+            <span class="text-4xl sm:text-6xl text-white font-bold">{{ countdown }}</span>
           </div>
 
           <!-- Sample Text Card -->
-          <Card class="mb-6 w-full bg-transparent dark:bg-gray-800 shadow-md">
+          <Card class="mb-4 sm:mb-6 w-full bg-transparent dark:bg-gray-800 shadow-md">
             <CardHeader>
-              <CardTitle class="text-purple-600 text-sm">Press play and read the following text</CardTitle>
+              <CardTitle class="text-xs sm:text-sm text-purple-600">Press play and read the following text</CardTitle>
             </CardHeader>
-            <CardContent class="py-4">
-              <p class="text-lg flex flex-wrap">
+            <CardContent class="py-2 sm:py-4">
+              <p class="text-base sm:text-lg flex flex-wrap">
                 <span 
                   v-for="(word, index) in paragraphs[currentParagraph - 1].split(' ')" 
                   :key="index"
                   :class="[
-                    'mr-2 mb-1 transition-all duration-300 ease-in-out',
+                    'mr-1 sm:mr-2 mb-1 transition-all duration-300 ease-in-out',
                     isWordRead(word, index)
                       ? 'text-purple-600 dark:text-purple-800 transform scale-105' 
                       : 'text-gray-800 dark:text-gray-300'
@@ -127,70 +82,61 @@
             </CardContent>
           </Card>
 
-          <div class="flex items-center justify-center gap-4">
+          <div class="flex items-center justify-center gap-2 sm:gap-4">
             <!-- Play/Pause Button -->
             <Button
               v-if="!isParaComplete"
               @click="handlePlayPause"
               size="icon"
-              class="h-12 w-12 rounded-full shadow-lg transition-all bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-800"
+              class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg transition-all bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-800"
               variant="default"
             >
-              <PlayIcon v-if="!isRecording || isPaused" class="h-5 w-5" />
-              <PauseIcon v-else class="h-5 w-5" />
+              <PlayIcon v-if="!isRecording || isPaused" class="h-4 w-4 sm:h-5 sm:w-5" />
+              <PauseIcon v-else class="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
             <!-- Recording Status -->
             <div
               v-if="isRecording && !isParaComplete"
-              class="flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm"
+              class="flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm"
             >
-              <MicrophoneIcon class="h-4 w-4 text-red-500 animate-pulse" />
-              <span class="text-sm font-medium">{{ recordingSeconds }}s</span>
+              <MicrophoneIcon class="h-3 w-3 sm:h-4 sm:w-4 text-red-500 animate-pulse" />
+              <span class="text-xs sm:text-sm font-medium">{{ recordingSeconds }}s</span>
             </div>
 
-            <!-- Done Button -->
-            <Button
-              v-if="isPaused"
-              @click="handleDone"
-              variant="success"
-              class="h-12 px-4 rounded-full shadow-lg bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
-            >
-              <CheckIcon class="h-5 w-5 mr-2" />
-              <span>Done</span>
-            </Button>
+            <!-- Control Buttons -->
+            <div class="flex gap-2 sm:gap-4">
+              <Button
+                v-if="isPaused"
+                @click="handleDone"
+                variant="success"
+                class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+              >
+                <CheckIcon class="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
 
-            <!-- Retry Button -->
-            <Button
-              v-if="isPaused || isParaComplete"
-              @click="retryParagraph"
-              variant="secondary"
-              size="icon"
-              class="h-12 w-12 rounded-full shadow-lg bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
-            >
-              <ReloadIcon class="h-5 w-5" />
-            </Button>
+              <Button
+                v-if="isPaused || isParaComplete"
+                @click="retryParagraph"
+                variant="secondary"
+                class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
+              >
+                <ReloadIcon class="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
 
-            <!-- Next Button -->
-            <Button
-              v-if="isParaComplete"
-              @click="handleNext"
-              :disabled="!isParaComplete"
-              class="h-12 px-4 rounded-full shadow-lg bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
-            >
-              <span>Next</span>
-              <ArrowRightIcon class="h-5 w-5 ml-2" />
-            </Button>
+              <Button
+                v-if="isParaComplete"
+                @click="handleNext"
+                :disabled="!isParaComplete"
+                class="h-10 sm:h-12 px-3 sm:px-4 rounded-full shadow-lg bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
+              >
+                <span class="text-sm sm:text-base">Next</span>
+                <ArrowRightIcon class="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+              </Button>
+            </div>
           </div>
-          <Button
-            v-if="isCalibrating"
-            @click="skipToHome"
-            class="fixed bottom-2 right-2 bg-gray-600/50 hover:bg-gray-700 dark:hover:text-white text-white px-6 py-2 dark:text-gray-500 rounded-full shadow-lg flex items-center gap-2"
-          >
-            <span>Skip</span>
-            <ArrowRightIcon class="h-5 w-5" />
-          </Button>
         </div>
+
       </DialogContent>
     </Dialog>
   </div>
@@ -233,9 +179,7 @@ const userInfo = ref({
 const userId = ref(null)
 
 const isFormComplete = computed(() => {
-  return userInfo.value.username?.trim() && 
-         userInfo.value.age && 
-         userInfo.value.school?.trim()
+  return userInfo.value.username?.trim()
 })
 
 const submitUserInfo = async () => {
@@ -248,15 +192,15 @@ const submitUserInfo = async () => {
   try {
     const response = await axios.post('https://dyslexai-gvbfgqdkdkg0dwhw.canadacentral-01.azurewebsites.net/demo-signup', {
       username: userInfo.value.username,
-      age: userInfo.value.age
+      age: 10
     })
     
     // Store user info for later use
     userId.value = response.data.id
     localStorage.setItem('userId', response.data.id)
     localStorage.setItem('username', response.data.username)
-    localStorage.setItem('age', userInfo.value.age)
-    localStorage.setItem('school', userInfo.value.school)
+    localStorage.setItem('age', 10)
+    localStorage.setItem('school', 'none')
     const initialResults = {
       wpm: [],
       errors: [],
@@ -269,6 +213,7 @@ const submitUserInfo = async () => {
     // Hide user info dialog and show calibration dialog
     showUserInfoDialog.value = false
     showDialog.value = true
+    startCalibration()
   } catch (error) {
     console.error('Error saving user info:', error)
   }
