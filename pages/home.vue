@@ -102,8 +102,8 @@
     <!-- Document Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div 
-        v-for="doc in documents"
-        :key="doc.id"
+        v-for="doc in [...documents].reverse()"
+        :key="doc.id"        
         class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 md:p-4"
         @click="navigateToRead(doc.extractedText, doc.fileName)"
 
