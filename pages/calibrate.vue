@@ -1,8 +1,9 @@
 <template>
-  <div class="min-h-screen bg-purple-50 dark:bg-gray-900 p-8 relative">
+  <div class="min-h-screen bg-purple-50 dark:bg-gray-900 p-8 relative gap-4">
     <Dialog :open="showDialog">
-      <DialogContent class="bg-purple-50 max-w-3xl mx-4 sm:mx-auto dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-2xl shadow-xl border border-purple-100 dark:border-gray-800">
-        <!-- Initial Welcome Content -->
+      <DialogContent class="bg-purple-50 max-w-3xl mx-auto p-2 sm:px-6 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-2xl shadow-xl border border-purple-100 dark:border-gray-800 ">
+
+<!-- Initial Welcome Content -->
         <div v-if="showUserInfoDialog" class="max-w-2xl mx-auto space-y-4 p-3 sm:p-6">
   <DialogHeader class="space-y-2">
     <DialogDescription class="text-lg sm:text-xl font-medium text-gray-700 dark:text-gray-300">
